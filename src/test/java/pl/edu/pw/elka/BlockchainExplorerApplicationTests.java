@@ -39,6 +39,6 @@ public class BlockchainExplorerApplicationTests {
 	public void returnsHello() throws Exception {
 		mvc.perform(get("/hello"))
 				.andExpect(status().isOk())
-				.andExpect(content().string("Hello from springboot!"));
+				.andExpect(content().string("Hello from springbooasdt!"));
 	}
 }

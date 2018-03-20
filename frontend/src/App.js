@@ -11,7 +11,7 @@ class App extends Component {
     }
 
     componentDidMount() {
-        fetch("http://localhost:8080/hello")
+        fetch("https://blockchain-explorer-was-taken.herokuapp.com/hello") // move api url to package.json
             .then(response => response.text())
             .then(response => this.setState({message: response}));
     }

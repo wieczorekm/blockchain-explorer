@@ -4,10 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,23 +20,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class BlockchainExplorerApplicationTests {
 
-	@Autowired
-	private WebApplicationContext context;
+    @Autowired
+    private WebApplicationContext context;
 
-	private MockMvc mvc;
+    private MockMvc mvc;
 
 
-	@Before
-	public void setup() {
-		mvc = MockMvcBuilders
-				.webAppContextSetup(context)
-				.build();
-	}
+    @Before
+    public void setup() {
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+    }
 
-	@Test
-	public void returnsHello() throws Exception {
-		mvc.perform(get("/hello"))
-				.andExpect(status().isOk())
-				.andExpect(content().string("Hello from springboot!"));
-	}
+    @Test
+    public void returnsHello() throws Exception {
+        mvc.perform(get("/hello"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Hello from springboot!"));
+    }
 }

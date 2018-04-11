@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Graph from './components/graph/Graph';
 import './App.css';
 
 class App extends Component {
@@ -19,7 +20,16 @@ class App extends Component {
     render() {
         const {message} = this.state;
         return (
-            <div>{message} Hello also from React!</div>
+            <div>
+                <h1>Blockchain Explorer {message}</h1>
+                <select>
+                    <option>Etherum</option>
+                    <option>Bitcoin</option>
+                </select>
+                <input />
+                <button>Explore</button>
+                <Graph />
+            </div>
         );
     }
 }

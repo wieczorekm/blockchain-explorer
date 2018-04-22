@@ -1,5 +1,5 @@
 package pl.edu.pw.elka.blocks.domain;
 
 interface BlockchainConnector {
-    BlockDetails fetchCurrentBlockDetails();
+    BlockDetails fetchCurrentBlockDetails(String blockNumber);
 }

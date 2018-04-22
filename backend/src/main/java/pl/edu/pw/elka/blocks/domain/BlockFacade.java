@@ -11,7 +11,7 @@ public class BlockFacade {
     }
 
     public BlockDetailsDto fetchBlockDetails(String blockNumber) {
-        BlockDetails blockDetails = blockchainConnector.fetchCurrentBlockDetails(blockNumber); //nie przypisujemy wartości polom w klasie BlockDetails
-        return blockDetails.toDto(); //wywoluje metode toDto z klasy BlockDetailsDto - to daje dane w JSON?
+        BlockDetails blockDetails = blockchainConnector.fetchCurrentBlockDetails(blockNumber);
+        return blockDetails.toDto();
     }
 }

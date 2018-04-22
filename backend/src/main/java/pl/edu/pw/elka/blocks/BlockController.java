@@ -19,7 +19,6 @@ class BlockController {
     @GetMapping(value = "/ethereum/blocks/{current}")
     public ResponseEntity<BlockDetailsDto> fetchCurrentBlockDetails(@PathVariable("current") String blockNumber) {
         BlockDetailsDto dto = facade.fetchBlockDetails(blockNumber);
-//        BlockDetailsDto dto = new BlockDetailsDto(123, "abcdjg", "okoko");
         return ResponseEntity.ok(dto);
     }
 }

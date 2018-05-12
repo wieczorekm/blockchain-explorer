@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,4 +19,10 @@ public class EtherscanTransactionDto {
 
     @JsonProperty
     private String to;
+
+    @JsonProperty
+    private String blockNumber;
+
+    @JsonProperty
+    private String value;
 }

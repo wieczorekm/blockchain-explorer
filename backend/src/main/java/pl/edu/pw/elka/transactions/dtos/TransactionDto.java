@@ -1,16 +1,17 @@
 package pl.edu.pw.elka.transactions.dtos;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Set;
+import java.math.BigDecimal;
 
 @Getter
 @RequiredArgsConstructor
-public class TransactionsDto {
+@EqualsAndHashCode
+public class TransactionDto {
 
     private final String address;
-    private final Set<TransactionDto> inTransactions;
-    private final Set<TransactionDto> outTransactions;
+    private final BigDecimal value;
 
 }

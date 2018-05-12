@@ -8,6 +8,7 @@ class EtherscanConfiguration {
 
     @Bean
     EtherscanFacade etherscanFacade() {
-        return new EtherscanFacade(new RealEtherscanConnector());
+        final RealEtherscanConnector etherscanConnector = new RealEtherscanConnector();
+        return new EtherscanFacade(etherscanConnector);
     }
 }

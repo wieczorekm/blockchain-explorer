@@ -11,6 +11,7 @@ public class EtherscanFacade {
     }
 
     public EtherscanTransactionsDto getTransactionsForAddress(String address) {
+        // TODO address validation
         return etherscanConnector.getTransactions(address);
     }
 }

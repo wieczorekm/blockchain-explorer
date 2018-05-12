@@ -12,8 +12,6 @@ public class EtherscanConnectorTests {
     @Test
     public void returnsTransactions() {
         EtherscanTransactionsDto dto = facade.getTransactionsForAddress("");
-
         assertThat(dto.getTransactions()).hasSize(2);
-
     }
 }

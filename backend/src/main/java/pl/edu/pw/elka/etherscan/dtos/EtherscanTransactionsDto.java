@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,5 +15,5 @@ import java.util.Set;
 public class EtherscanTransactionsDto {
 
     @JsonProperty(value = "result")
-    private Set<EtherscanTransactionDto> transactions;
+    private List<EtherscanTransactionDto> transactions;
 }

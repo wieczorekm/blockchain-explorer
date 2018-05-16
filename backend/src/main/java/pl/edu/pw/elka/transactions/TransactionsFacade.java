@@ -8,6 +8,7 @@ import pl.edu.pw.elka.transactions.dtos.TransactionsDto;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TransactionsFacade {
 
@@ -20,22 +21,15 @@ public class TransactionsFacade {
 
     public TransactionsDto getTransactionsForAddress(String address) {
         final List<EtherscanTransactionDto> transactions = etherscanFacade.getTransactionsForAddress(address).getTransactions();
-        final List<TransactionDto> collect = transactions.stream()
+        final Set<TransactionDto> inTransactions = transactions.stream()
                 .filter(tx -> tx.getTo().equals(address))
-                .map(tx -> new TransactionDto(tx.getFrom(), mapWeiToEther(tx.getValue())))
-                .collect(Collectors.toList());
-
-        final Map<String, TransactionDto> inTransactionsMap = new HashMap<>();
-        for (TransactionDto transactionDto : collect) {
-            if (inTransactionsMap.containsKey(transactionDto.getAddress())) {
-                final TransactionDto dto = inTransactionsMap.get(transactionDto.getAddress());
-                inTransactionsMap.put(transactionDto.getAddress(), new TransactionDto(transactionDto.getAddress(), dto.getValue().add(transactionDto.getValue())));
-            } else {
-                inTransactionsMap.put(transactionDto.getAddress(), transactionDto);
-            }
-        }
-
-        final Set<TransactionDto> inTransactions = new HashSet<>(inTransactionsMap.values());
+                .collect(Collectors.groupingBy(
+                        EtherscanTransactionDto::getFrom,
+                        Collectors.reducing(BigDecimal.ZERO, tx -> mapWeiToEther(tx.getValue()), BigDecimal::add)))
+                .entrySet()
+                .stream()
+                .map(entry -> new TransactionDto(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet());
 
         final Set<TransactionDto> outTransactions = transactions.stream()
                 .filter(tx -> tx.getFrom().equals(address))

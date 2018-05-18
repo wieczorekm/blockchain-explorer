@@ -51,6 +51,21 @@
 			<artifactId>fe</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+        <dependency>
+            <groupId>com.tmp</groupId>
+            <artifactId>fe</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>parent</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>demo</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 
 	</dependencies>

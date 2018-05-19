@@ -36,7 +36,13 @@ public class TransactionsFacade {
                 .map(tx -> new TransactionDto(tx.getTo(), mapWeiToEther(tx.getValue())))
                 .collect(Collectors.toSet());
 
-        return new TransactionsDto(address, inTransactions, outTransactions);
+        final BigDecimal minedBlocksReward = etherscanFacade.getMinedBlocksRewardForAddress(address)
+                .getMinedBlocksRewards()
+                .stream()
+                .map(block -> mapWeiToEther(block.getBlockReward()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return new TransactionsDto(address, inTransactions, outTransactions, minedBlocksReward);
     }
 
     private BigDecimal mapWeiToEther(String value) {

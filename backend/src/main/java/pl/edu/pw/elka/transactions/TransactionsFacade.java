@@ -5,6 +5,7 @@ import pl.edu.pw.elka.etherscan.dtos.EtherscanTransactionDto;
 import pl.edu.pw.elka.transactions.dtos.TransactionDto;
 import pl.edu.pw.elka.transactions.dtos.TransactionsDto;
 
+import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,11 +37,17 @@ public class TransactionsFacade {
                 .map(tx -> new TransactionDto(tx.getTo(), mapWeiToEther(tx.getValue())))
                 .collect(Collectors.toSet());
 
-        final BigDecimal minedBlocksReward = etherscanFacade.getMinedBlocksRewardForAddress(address)
-                .getMinedBlocksRewards()
-                .stream()
-                .map(block -> mapWeiToEther(block.getBlockReward()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal minedBlocksReward;
+        try {
+            minedBlocksReward = etherscanFacade.getMinedBlocksForAddress(address)
+                    .getMinedBlocksRewards()
+                    .stream()
+                    .map(block -> mapWeiToEther(block.getBlockReward()))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        } catch (NullPointerException e) {
+            minedBlocksReward = BigDecimal.ZERO;
+        }
 
         return new TransactionsDto(address, inTransactions, outTransactions, minedBlocksReward);
     }

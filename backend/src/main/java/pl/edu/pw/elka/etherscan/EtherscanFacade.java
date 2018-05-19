@@ -16,7 +16,7 @@ public class EtherscanFacade {
         return etherscanConnector.getTransactions(address);
     }
 
-    public MinedBlocksDto getMinedBlocksRewardForAddress(String address){
+    public MinedBlocksDto getMinedBlocksForAddress(String address){
         //TODO address validation
         return etherscanConnector.getMinedBlocks(address);
     }

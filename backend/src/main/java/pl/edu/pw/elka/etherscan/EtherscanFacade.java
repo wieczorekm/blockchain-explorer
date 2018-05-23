@@ -11,7 +11,8 @@ public class EtherscanFacade {
     }
 
     public EtherscanTransactionsDto getTransactionsForAddress(String address) {
-        // TODO address validation
+        EthereumAddressValidator ethereumAddressValidator = new EthereumAddressValidator();
+        ethereumAddressValidator.validateAddress(address);
         return etherscanConnector.getTransactions(address);
     }
 }

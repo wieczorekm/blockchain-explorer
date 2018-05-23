@@ -3,6 +3,7 @@ package pl.edu.pw.elka.etherscan.validator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import pl.edu.pw.elka.etherscan.BadEthereumAddressException;
 import pl.edu.pw.elka.etherscan.EthereumAddressValidator;
@@ -18,8 +19,8 @@ public class EthereumAddressValidatorTests {
     private static final String ADDRESS_7 = "0xbff4c784f69c825e21d079ac6Aacdf1f8d317ece";   // BIG LETTER
     private static final String ADDRESS_8 = "0x804cb76f481bd3c8190aE48486790cd4996f4542";   // BIG LETTER
 
-    Exception exception;
-    BadEthereumAddressException badEthereumAddressException = new BadEthereumAddressException("Wrong Ethereum address");
+    private Exception exception;
+    private BadEthereumAddressException badEthereumAddressException = new BadEthereumAddressException("Wrong Ethereum address");
 
     @Test
     public void testCorrectAddress1() {
@@ -29,7 +30,7 @@ public class EthereumAddressValidatorTests {
         } catch (Exception e) {
             exception = e;
         }
-        assertEquals(null, exception);
+        assertNull(exception);
     }
 
     @Test
@@ -40,7 +41,7 @@ public class EthereumAddressValidatorTests {
         } catch (Exception e) {
             exception = e;
         }
-        assertEquals(null, exception);
+        assertNull(exception);
     }
 
     @Test

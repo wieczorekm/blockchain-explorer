@@ -16,7 +16,7 @@ class TransactionsController {
 
     @GetMapping(value = "/ethereum/transactions/{address}")
     TransactionsDto getTransactions(@PathVariable String address) {
-        return facade.getTransactionsForAddress(address/*.toLowerCase()*/);
+        return facade.getTransactionsForAddress(address);
     }
 
 }

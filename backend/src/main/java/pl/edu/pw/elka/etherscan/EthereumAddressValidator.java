@@ -9,7 +9,6 @@ public class EthereumAddressValidator {
     private final static char correctSecondChar = 'x';
 
     public void validateAddress(String address){
-        if(!address.equals("")) {       // This if is only temporary to let test "EtherscanConnectorTests-returnsTransactions" pass
             validateNull(address);
             validateLength(address);
             validateFirstChar(address);
@@ -17,7 +16,6 @@ public class EthereumAddressValidator {
             String addressWithout0x = address.replaceFirst("0x", "");
             validateStructure(addressWithout0x);
             validateChecksum(addressWithout0x);
-        }
     }
 
     private void validateNull(String address) {

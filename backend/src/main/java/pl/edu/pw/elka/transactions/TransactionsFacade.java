@@ -16,9 +16,9 @@ public class TransactionsFacade {
     private final EtherscanFacade etherscanFacade;
     private final MinedBlocksFacade minedBlocksFacade;
 
-    public TransactionsFacade(EtherscanFacade etherscanFacade) {
+    public TransactionsFacade(EtherscanFacade etherscanFacade, MinedBlocksFacade minedBlocksFacade) {
         this.etherscanFacade = etherscanFacade;
-        minedBlocksFacade = new MinedBlocksFacade(etherscanFacade);
+        this.minedBlocksFacade = minedBlocksFacade;
     }
 
     public TransactionsDto getTransactionsForAddress(String address) {
@@ -39,16 +39,8 @@ public class TransactionsFacade {
                 .collect(Collectors.toSet());
 
 
-        BigDecimal minedBlocksReward;
-        try {
-            minedBlocksReward = minedBlocksFacade.getMinedBlocksForAddress(address)
-                    .getMinedBlocksRewards()
-                    .stream()
-                    .map(block -> mapWeiToEther(block.getBlockReward()))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-        } catch (NullPointerException e) {
-            minedBlocksReward = BigDecimal.ZERO;
-        }
+        BigDecimal minedBlocksReward = minedBlocksFacade
+                .getMinedBlocksRewardForAddress(address);
 
         return new TransactionsDto(address, inTransactions, outTransactions, minedBlocksReward);
     }

@@ -83,11 +83,11 @@ class MockEtherscanConnector implements EtherscanConnector {
                 "  \"result\": [{\n" +
                 "    \"blockNumber\": \"3462296\",\n" +
                 "    \"timeStamp\": \"1491118514\",\n" +
-                "    \"blockReward\": \"5194770940000000000\"\n" +
+                "    \"blockReward\": \"3000000000000000000\"\n" +
                 "  }, {\n" +
                 "    \"blockNumber\": \"2691400\",\n" +
                 "    \"timeStamp\": \"1480072029\",\n" +
-                "    \"blockReward\":\"5086562212310617100\"\n" +
+                "    \"blockReward\":\"4000000000000000000\"\n" +
                 "  }]\n" +
                 "}";
     }

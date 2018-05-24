@@ -7,6 +7,7 @@ import pl.edu.pw.elka.etherscan.EtherscanFacade;
 import pl.edu.pw.elka.minedBlocks.dtos.MinedBlockDto;
 import pl.edu.pw.elka.minedBlocks.dtos.MinedBlocksDto;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,7 @@ import static org.mockito.Matchers.any;
 
 public class MinedBlocksTests {
 
+    private static final BigDecimal WEIS_IN_ETHER = BigDecimal.TEN.pow(18);
     private static final String MY_ADDRESS = "0xe103f7baef7a048cb22a4d566a37f72f762df229";
 
     private MinedBlocksFacade minedBlocksFacade;
@@ -28,32 +30,30 @@ public class MinedBlocksTests {
     }
 
     @Test
-    public void shouldReturnNoBlocks() {
+    public void shouldReturnNoBlocksAndValueZeroEther() {
         mockEmptyBlocks();
         final MinedBlocksDto blocks = minedBlocksFacade.getMinedBlocksForAddress(MY_ADDRESS);
         assertThat(blocks.getMinedBlocksRewards()).hasSize(0);
+        final BigDecimal reward = minedBlocksFacade.getMinedBlocksRewardForAddress(MY_ADDRESS);
+        assertThat(reward).isEqualTo(BigDecimal.ZERO);
     }
 
     @Test
-    public void shouldReturnOneBlock() {
-        mockOneBlock();
+    public void shouldReturnOneBlockAndValue1Ether() {
+        mockOneBlockWithValue(WEIS_IN_ETHER.toString());
         final MinedBlocksDto blocks = minedBlocksFacade.getMinedBlocksForAddress(MY_ADDRESS);
         assertThat(blocks.getMinedBlocksRewards()).hasSize(1);
+        final BigDecimal reward = minedBlocksFacade.getMinedBlocksRewardForAddress(MY_ADDRESS);
+        assertThat(reward.toString()).isEqualTo("1");
     }
 
     @Test
-    public void shouldReturnTwoBlocks() {
-        mockTwoBlocks();
+    public void shouldReturnTwoBlocksAndValue3Ether() {
+        mockTwoBlocksWithValues(WEIS_IN_ETHER, WEIS_IN_ETHER.add(WEIS_IN_ETHER));
         final MinedBlocksDto blocks = minedBlocksFacade.getMinedBlocksForAddress(MY_ADDRESS);
         assertThat(blocks.getMinedBlocksRewards()).hasSize(2);
-    }
-
-    @Test
-    public void shouldReturnOneBlockWith1Ether() {
-        mockOneBlockWithValue("1");
-        final MinedBlocksDto blocks = minedBlocksFacade.getMinedBlocksForAddress(MY_ADDRESS);
-        MinedBlockDto block = blocks.getMinedBlocksRewards().stream().findAny().get();
-        assertThat(block.getBlockReward()).isEqualTo("1");
+        final BigDecimal reward = minedBlocksFacade.getMinedBlocksRewardForAddress(MY_ADDRESS);
+        assertThat(reward.toString()).isEqualTo("3");
     }
 
     private void mockOneBlockWithValue(String value) {
@@ -63,20 +63,13 @@ public class MinedBlocksTests {
                 .thenReturn(new MinedBlocksDto(blocks));
     }
 
-    private void mockTwoBlocks() {
+    private void mockTwoBlocksWithValues(BigDecimal val1, BigDecimal val2) {
         final MinedBlockDto[] blockDtos = {
-                new MinedBlockDto(null),
-                new MinedBlockDto(null)
+                new MinedBlockDto(val1.toString()),
+                new MinedBlockDto(val2.toString())
         };
         Mockito.when(etherscanFacade.getMinedBlocksForAddress(any()))
                 .thenReturn(new MinedBlocksDto(Arrays.asList(blockDtos)));
-    }
-
-    private void mockOneBlock() {
-        final MinedBlockDto block = new MinedBlockDto(null);
-        final List<MinedBlockDto> blocks = Collections.singletonList(block);
-        Mockito.when(etherscanFacade.getMinedBlocksForAddress(any()))
-                .thenReturn(new MinedBlocksDto(blocks));
     }
 
     private void mockEmptyBlocks() {

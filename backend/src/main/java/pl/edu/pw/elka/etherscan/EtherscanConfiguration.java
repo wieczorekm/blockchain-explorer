@@ -9,6 +9,7 @@ class EtherscanConfiguration {
     @Bean
     EtherscanFacade etherscanFacade() {
         final RealEtherscanConnector etherscanConnector = new RealEtherscanConnector();
-        return new EtherscanFacade(etherscanConnector);
+        final EthereumAddressValidator ethereumAddressValidator = new EthereumAddressValidator();
+        return new EtherscanFacade(etherscanConnector, ethereumAddressValidator);
     }
 }

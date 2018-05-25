@@ -5,13 +5,14 @@ import pl.edu.pw.elka.etherscan.dtos.EtherscanTransactionsDto;
 public class EtherscanFacade {
 
     private final EtherscanConnector etherscanConnector;
+    private final EthereumAddressValidator ethereumAddressValidator;
 
-    public EtherscanFacade(EtherscanConnector etherscanConnector) {
+    EtherscanFacade(EtherscanConnector etherscanConnector, EthereumAddressValidator ethereumAddressValidator) {
         this.etherscanConnector = etherscanConnector;
+        this.ethereumAddressValidator = ethereumAddressValidator;
     }
 
     public EtherscanTransactionsDto getTransactionsForAddress(String address) {
-        EthereumAddressValidator ethereumAddressValidator = new EthereumAddressValidator();
         ethereumAddressValidator.validateAddress(address);
         return etherscanConnector.getTransactions(address);
     }

@@ -8,27 +8,26 @@ import java.util.Optional;
 
 public class MinedBlocksFacade {
 
-    private  final EtherscanFacade etherscanFacade;
+    private final EtherscanFacade etherscanFacade;
     private static final BigDecimal WEIS_IN_ETHER = BigDecimal.TEN.pow(18);
 
     public MinedBlocksFacade(EtherscanFacade etherscanFacade) {
         this.etherscanFacade = etherscanFacade;
     }
 
-    public BigDecimal getMinedBlocksRewardForAddress(String address){
+    public BigDecimal getMinedBlocksRewardForAddress(String address) {
         Optional<MinedBlocksDto> blocksOpt = Optional.ofNullable(
                 getMinedBlocksForAddress(address));
 
-        return blocksOpt.isPresent() ?
-                blocksOpt.get()
-                        .getMinedBlocksRewards()
+        return blocksOpt.map(
+                blocks -> blocks.getMinedBlocksRewards()
                         .stream()
                         .map(block -> mapWeiToEther(block.getBlockReward()))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                : BigDecimal.ZERO;
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .orElse(BigDecimal.ZERO);
     }
 
-    public MinedBlocksDto getMinedBlocksForAddress(String address){
+    MinedBlocksDto getMinedBlocksForAddress(String address) {
         return etherscanFacade.getMinedBlocksForAddress(address);
     }
 

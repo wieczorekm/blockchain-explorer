@@ -128,42 +128,18 @@ public class TransactionsTest {
         assertThat(dto.getValue()).isEqualTo(new BigDecimal("2"));
     }
 
-//    @Test
-//    public void shouldReturnRewardForOneBlock1Ether() {
-//        mockOneInTransactionWithValue(WEIS_IN_ETHER);
-//        mockOneMinedBlockWithValue(WEIS_IN_ETHER);
-//        final TransactionsDto transactions = transactionsFacade.getTransactionsForAddress(MY_ADDRESS);
-//        assertThat(transactions.getMinedBlocksReward()).isEqualTo("1");
-//    }
-//
-//    @Test
-//    public void shouldReturnRewardForTwoBlocks7Ether() {
-//        mockOneInTransactionWithValue(WEIS_IN_ETHER);
-//        mockTwoMinedBlocksWithValues(
-//                WEIS_IN_ETHER.multiply(new BigDecimal("3")),
-//                WEIS_IN_ETHER.multiply(new BigDecimal("4"))
-//        );
-//        final TransactionsDto transactions = transactionsFacade.getTransactionsForAddress(MY_ADDRESS);
-//        assertThat(transactions.getMinedBlocksReward()).isEqualTo("7");
-//    }
-//
-//    private void mockOneMinedBlockWithValue(BigDecimal value) {
-//        final MinedBlockDto block = new MinedBlockDto(value.toString());
-//        final List<MinedBlockDto> blocks = Collections.singletonList(block);
-//        Mockito.when(minedBlocksFacade.getMinedBlocksForAddress(any())).thenReturn(
-//                new MinedBlocksDto(blocks)
-//        );
-//    }
-//
-//    private void mockTwoMinedBlocksWithValues(BigDecimal val1, BigDecimal val2) {
-//        final MinedBlockDto[] blocks = {
-//                new MinedBlockDto(val1.toString()),
-//                new MinedBlockDto(val2.toString())
-//        };
-//        Mockito.when(minedBlocksFacade.getMinedBlocksForAddress(any())).thenReturn(
-//                new MinedBlocksDto(Arrays.asList(blocks))
-//        );
-//    }
+    @Test
+    public void shouldReturnReward1Ether() {
+        mockOneInTransactionWithValue(WEIS_IN_ETHER);
+        mockOneRewardWithValue(WEIS_IN_ETHER);
+        final TransactionsDto transactions = transactionsFacade.getTransactionsForAddress(MY_ADDRESS);
+        assertThat(transactions.getMinedBlocksReward()).isEqualTo(WEIS_IN_ETHER);
+    }
+
+    private void mockOneRewardWithValue(BigDecimal value) {
+        Mockito.when(minedBlocksFacade.getMinedBlocksRewardForAddress(any()))
+                .thenReturn(value);
+    }
 
     private void mockEmptyTransactions() {
         Mockito.when(etherscanFacade.getTransactionsForAddress(any())).thenReturn(

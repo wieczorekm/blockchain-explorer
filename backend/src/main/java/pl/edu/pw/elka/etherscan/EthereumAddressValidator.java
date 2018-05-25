@@ -20,31 +20,31 @@ public class EthereumAddressValidator {
 
     private void validateNull(String address) {
         if(address == null) {
-            throw new BadEthereumAddressException("Wrong Ethereum address");
+            throw new BadEthereumAddressException("Wrong Ethereum address - No address");
         }
     }
 
     private void validateLength(String address) {
         if(address.length() != correctAddressLength) {
-            throw new BadEthereumAddressException("Wrong Ethereum address");
+            throw new BadEthereumAddressException("Wrong Ethereum address - Wrong address length");
         }
     }
 
     private void validateFirstChar(String address) {
         if(address.charAt(0) != correctFirstChar) {
-            throw new BadEthereumAddressException("Wrong Ethereum address");
+            throw new BadEthereumAddressException("Wrong Ethereum address - 0x prefix not found");
         }
     }
 
     private void validateSecondChar(String address) {
         if(address.charAt(1) != correctSecondChar) {
-            throw new BadEthereumAddressException("Wrong Ethereum address");
+            throw new BadEthereumAddressException("Wrong Ethereum address - 0x prefix not found");
         }
     }
 
     private void validateStructure(String address) {
         if(!address.equals(address.toUpperCase()) && !address.equals(address.toLowerCase())) {
-            throw new BadEthereumAddressException("Wrong Ethereum address");
+            throw new BadEthereumAddressException("Wrong Ethereum address - Wrong address structure");
         }
     }
 

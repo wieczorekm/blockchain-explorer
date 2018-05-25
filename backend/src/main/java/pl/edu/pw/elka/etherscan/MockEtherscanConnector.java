@@ -2,6 +2,7 @@ package pl.edu.pw.elka.etherscan;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.edu.pw.elka.etherscan.dtos.EtherscanTransactionsDto;
+import pl.edu.pw.elka.minedBlocks.dtos.MinedBlocksDto;
 
 import java.io.IOException;
 
@@ -13,6 +14,17 @@ class MockEtherscanConnector implements EtherscanConnector {
         String sampleResponse = getSampleResponse();
         try {
             return objectMapper.readValue(sampleResponse, EtherscanTransactionsDto.class);
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public MinedBlocksDto getMinedBlocks(String address) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String sampleResponse = getSampleMinedBlocks();
+        try {
+            return objectMapper.readValue(sampleResponse, MinedBlocksDto.class);
         } catch (IOException e) {
             throw new RuntimeException();
         }
@@ -60,6 +72,22 @@ class MockEtherscanConnector implements EtherscanConnector {
                 "    \"cumulativeGasUsed\": \"4278112\",\n" +
                 "    \"gasUsed\": \"21000\",\n" +
                 "    \"confirmations\": \"590620\"\n" +
+                "  }]\n" +
+                "}";
+    }
+
+    private String getSampleMinedBlocks() {
+        return "{\n" +
+                "  \"status\": \"1\",\n" +
+                "  \"message\": \"OK\",\n" +
+                "  \"result\": [{\n" +
+                "    \"blockNumber\": \"3462296\",\n" +
+                "    \"timeStamp\": \"1491118514\",\n" +
+                "    \"blockReward\": \"3000000000000000000\"\n" +
+                "  }, {\n" +
+                "    \"blockNumber\": \"2691400\",\n" +
+                "    \"timeStamp\": \"1480072029\",\n" +
+                "    \"blockReward\":\"4000000000000000000\"\n" +
                 "  }]\n" +
                 "}";
     }

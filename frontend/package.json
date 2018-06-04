@@ -20,6 +20,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "babel-preset-stage-0": "^6.24.1",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.4.1"
   }

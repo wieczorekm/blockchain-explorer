@@ -150,21 +150,21 @@ public class TransactionsTest {
     }
 
     private void mockEmptyTransactions() {
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(Collections.emptyList()));
     }
 
     private void mockOneInTransaction() {
         final EtherscanTransactionDto tx = new EtherscanTransactionDto(ADDRESS_1, MY_ADDRESS, null, ONE);
         final List<EtherscanTransactionDto> transactions = Collections.singletonList(tx);
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(transactions));
     }
 
     private void mockOneInTransactionWithValue(BigDecimal value) {
         final EtherscanTransactionDto tx = new EtherscanTransactionDto(ADDRESS_1, MY_ADDRESS, null, value.toString());
         final List<EtherscanTransactionDto> transactions = Collections.singletonList(tx);
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(transactions));
     }
 
@@ -173,21 +173,21 @@ public class TransactionsTest {
                 new EtherscanTransactionDto(ADDRESS_1, MY_ADDRESS, null, ONE),
                 new EtherscanTransactionDto(ADDRESS_2, MY_ADDRESS, null, ONE),
         };
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(Arrays.asList(txs)));
     }
 
     private void mockOneOutTransaction() {
         final EtherscanTransactionDto tx = new EtherscanTransactionDto(MY_ADDRESS, ADDRESS_1, null, ONE);
         final List<EtherscanTransactionDto> transactions = Collections.singletonList(tx);
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(transactions));
     }
 
     private void mockOneOutTransactionWithValue(BigDecimal value) {
         final EtherscanTransactionDto tx = new EtherscanTransactionDto(MY_ADDRESS, ADDRESS_1, null, value.toString());
         final List<EtherscanTransactionDto> transactions = Collections.singletonList(tx);
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(transactions));
     }
 
@@ -196,7 +196,7 @@ public class TransactionsTest {
                 new EtherscanTransactionDto(ADDRESS_1, MY_ADDRESS, null, WEIS_IN_ETHER.toString()),
                 new EtherscanTransactionDto(ADDRESS_1, MY_ADDRESS, null, WEIS_IN_ETHER.toString()),
         };
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(Arrays.asList(txs)));
 
     }
@@ -206,7 +206,7 @@ public class TransactionsTest {
                 new EtherscanTransactionDto(MY_ADDRESS, ADDRESS_1, null, WEIS_IN_ETHER.toString()),
                 new EtherscanTransactionDto(MY_ADDRESS, ADDRESS_1, null, WEIS_IN_ETHER.toString()),
         };
-        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), SAMPLE_START_BLOCK, SAMPLE_END_BLOCK)).thenReturn(
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any(), any(), any())).thenReturn(
                 new EtherscanTransactionsDto(Arrays.asList(txs)));
 
     }

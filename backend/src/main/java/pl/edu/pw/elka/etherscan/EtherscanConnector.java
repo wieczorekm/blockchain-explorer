@@ -5,6 +5,6 @@ import pl.edu.pw.elka.minedBlocks.dtos.MinedBlocksDto;
 
 interface EtherscanConnector {
 
-    EtherscanTransactionsDto getTransactions(String address);
+    EtherscanTransactionsDto getTransactions(String address, String startBlock, String endBlock);
     MinedBlocksDto getMinedBlocks(String address);
 }

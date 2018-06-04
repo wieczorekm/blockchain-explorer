@@ -24,8 +24,9 @@ public class TransactionsFacade {
         this.minedBlocksFacade = minedBlocksFacade;
     }
 
-    public TransactionsDto getTransactionsForAddress(String address) {
-        final List<EtherscanTransactionDto> transactions = etherscanFacade.getTransactionsForAddress(address).getTransactions();
+    public TransactionsDto getTransactionsForAddress(String address, String startBlock, String endBlock) {
+        final List<EtherscanTransactionDto> transactions = etherscanFacade.getTransactionsForAddress(address, startBlock, endBlock)
+                .getTransactions();
 
         final Stream<EtherscanTransactionDto> inStream = transactions.stream()
                 .filter(tx -> tx.getTo().equals(address));

@@ -120,11 +120,20 @@ public class TransactionsTest {
     }
 
     @Test
-    public void shouldAddTransactionValuesFromTheSameAddress() {
+    public void shouldAddTransactionInValuesFromTheSameAddress() {
         mockTwoInTransactionsFromTheSameAddress();
         final TransactionsDto txs = transactionsFacade.getTransactionsForAddress(MY_ADDRESS);
         assertThat(txs.getInTransactions()).hasSize(1);
         TransactionDto dto = txs.getInTransactions().stream().findAny().get();
+        assertThat(dto.getValue()).isEqualTo(new BigDecimal("2"));
+    }
+
+    @Test
+    public void shouldAddTransactionOutValuesFromTheSameAddress() {
+        mockTwoOutTransactionsFromTheSameAddress();
+        final TransactionsDto txs = transactionsFacade.getTransactionsForAddress(MY_ADDRESS);
+        assertThat(txs.getOutTransactions()).hasSize(1);
+        TransactionDto dto = txs.getOutTransactions().stream().findAny().get();
         assertThat(dto.getValue()).isEqualTo(new BigDecimal("2"));
     }
 
@@ -187,6 +196,16 @@ public class TransactionsTest {
         final EtherscanTransactionDto[] txs = {
                 new EtherscanTransactionDto(ADDRESS_1, MY_ADDRESS, null, WEIS_IN_ETHER.toString()),
                 new EtherscanTransactionDto(ADDRESS_1, MY_ADDRESS, null, WEIS_IN_ETHER.toString()),
+        };
+        Mockito.when(etherscanFacade.getTransactionsForAddress(any())).thenReturn(
+                new EtherscanTransactionsDto(Arrays.asList(txs)));
+
+    }
+
+    private void mockTwoOutTransactionsFromTheSameAddress() {
+        final EtherscanTransactionDto[] txs = {
+                new EtherscanTransactionDto(MY_ADDRESS, ADDRESS_1, null, WEIS_IN_ETHER.toString()),
+                new EtherscanTransactionDto(MY_ADDRESS, ADDRESS_1, null, WEIS_IN_ETHER.toString()),
         };
         Mockito.when(etherscanFacade.getTransactionsForAddress(any())).thenReturn(
                 new EtherscanTransactionsDto(Arrays.asList(txs)));

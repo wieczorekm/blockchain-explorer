@@ -8,7 +8,10 @@ import pl.edu.pw.elka.transactions.dtos.TransactionsDto;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TransactionsFacade {
 
@@ -23,26 +26,31 @@ public class TransactionsFacade {
 
     public TransactionsDto getTransactionsForAddress(String address) {
         final List<EtherscanTransactionDto> transactions = etherscanFacade.getTransactionsForAddress(address).getTransactions();
-        final Set<TransactionDto> inTransactions = transactions.stream()
-                .filter(tx -> tx.getTo().equals(address))
-                .collect(Collectors.groupingBy(
-                        EtherscanTransactionDto::getFrom,
-                        Collectors.reducing(BigDecimal.ZERO, tx -> mapWeiToEther(tx.getValue()), BigDecimal::add)))
+
+        final Stream<EtherscanTransactionDto> inStream = transactions.stream()
+                .filter(tx -> tx.getTo().equals(address));
+
+        final Stream<EtherscanTransactionDto> outStream = transactions.stream()
+                .filter(tx -> tx.getFrom().equals(address));
+
+        return new TransactionsDto(address,
+                collectToResultSet(inStream, EtherscanTransactionDto::getFrom),
+                collectToResultSet(outStream, EtherscanTransactionDto::getTo),
+                minedBlocksFacade.getMinedBlocksRewardForAddress(address));
+    }
+
+    private Set<TransactionDto> collectToResultSet(Stream<EtherscanTransactionDto> dtos, Function<EtherscanTransactionDto, String> getFunction) {
+        return dtos
+                .collect(getCollector(getFunction))
                 .entrySet()
                 .stream()
                 .map(entry -> new TransactionDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toSet());
+    }
 
-        final Set<TransactionDto> outTransactions = transactions.stream()
-                .filter(tx -> tx.getFrom().equals(address))
-                .map(tx -> new TransactionDto(tx.getTo(), mapWeiToEther(tx.getValue())))
-                .collect(Collectors.toSet());
-
-
-        BigDecimal minedBlocksReward = minedBlocksFacade
-                .getMinedBlocksRewardForAddress(address);
-
-        return new TransactionsDto(address, inTransactions, outTransactions, minedBlocksReward);
+    private Collector<EtherscanTransactionDto, ?, Map<String, BigDecimal>> getCollector(Function<EtherscanTransactionDto, String> getFunction) {
+        return Collectors.groupingBy(getFunction,
+                Collectors.reducing(BigDecimal.ZERO, tx -> mapWeiToEther(tx.getValue()), BigDecimal::add));
     }
 
     private BigDecimal mapWeiToEther(String value) {

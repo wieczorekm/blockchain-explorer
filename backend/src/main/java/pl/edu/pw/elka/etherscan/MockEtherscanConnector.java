@@ -9,7 +9,7 @@ import java.io.IOException;
 class MockEtherscanConnector implements EtherscanConnector {
 
     @Override
-    public EtherscanTransactionsDto getTransactions(String address) {
+    public EtherscanTransactionsDto getTransactions(String address, String startBlock, String endBlock) {
         ObjectMapper objectMapper = new ObjectMapper();
         String sampleResponse = getSampleResponse();
         try {

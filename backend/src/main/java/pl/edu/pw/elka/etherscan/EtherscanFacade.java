@@ -13,9 +13,9 @@ public class EtherscanFacade {
         this.ethereumAddressValidator = ethereumAddressValidator;
     }
 
-    public EtherscanTransactionsDto getTransactionsForAddress(String address) {
+    public EtherscanTransactionsDto getTransactionsForAddress(String address, String startBlock, String endBlock) {
         ethereumAddressValidator.validateAddress(address);
-        return etherscanConnector.getTransactions(address);
+        return etherscanConnector.getTransactions(address, startBlock, endBlock);
     }
 
     public MinedBlocksDto getMinedBlocksForAddress(String address){

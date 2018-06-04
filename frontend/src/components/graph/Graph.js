@@ -1,80 +1,113 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
+import _ from 'lodash';
 import { select } from 'd3-selection';
-import { forceSimulation, forceManyBody, forceLink, forceX, forceY } from 'd3-force';
+import { forceSimulation, forceManyBody, forceLink } from 'd3-force';
+
 import './Graph.css';
 
-class Graph extends PureComponent {
-    renderGraph = () => {
-        // To be move to component's method
-        function ticked() {
-            selectedLinks.attr('x1', (d) => d.source.x)
-                .attr('y1', (d) => d.source.y)
-                .attr('x2', (d) => d.target.x)
-                .attr('y2', (d) => d.target.y);
+const R = 5;
+const CHARGE_STRENGTH = -20;
 
-            selectedNodes.attr("transform", (d) => `translate(${d.x},${d.y})`);
+class Graph extends Component {
+    reduceDuplications = (prev, curr) => {
+        const duplicated = prev.find(({address}) => address === curr.address);
+
+        if (duplicated) {
+            duplicated.transactions += 1;
+            return prev;
         }
 
-        const width = 640;
-        const height = 480;
-        const r = 20;
-        const fontSize = 16;
-        const textOffset = fontSize / 4;
+        return prev.concat(curr);
+    };
 
-        const nodes = [
-            { address: 'sampleNode1' },
-            { address: 'sampleNode2' },
-            { address: 'sampleNode3' },
-            { address: 'sampleNode4' },
-        ];
+    getTicked = (links, nodes) => () => {
+        links.attr('d', ({ target, source }) => {
+            const dx = target.x - source.x;
+            const dy = target.y - source.y;
+            const dr = Math.sqrt(dx * dx + dy * dy);
 
-        const links = [
-            { source: 'sampleNode1', target: 'sampleNode2' },
-            { source: 'sampleNode1', target: 'sampleNode3' },
-            { source: 'sampleNode1', target: 'sampleNode4' },
-        ]
+            return `M${source.x},${source.y}A${dr},${dr} 0 0,1 ${target.x},${target.y}`;
+        });
 
-        const graph = select('.graph')
-            .append('svg')
-            .attr('width', width)
-            .attr('height', height);
+        nodes.attr('transform', (d) => `translate(${d.x},${d.y})`);
+    };
 
+    renderGraph = () => {
+        const { address, inTransactions, outTransactions } = this.props;
+        const graph = select('.graph');
+        const { width, height } = graph
+            .node()
+            .getBoundingClientRect();
         const simulation = forceSimulation()
-            .force("charge", forceManyBody().strength(-300))
-            .force('link', forceLink().id((d) => d.address).distance(150))
-            .force("x", forceX(width / 2))
-            .force("y", forceY(height / 2))
-            .on('tick', ticked);
+            .force('charge', forceManyBody().strength(CHARGE_STRENGTH))
+            .force('link', forceLink().id((d) => d.address).distance(width / 4));
 
-        let selectedLinks = graph.selectAll('.link');
-        let selectedNodes = graph.selectAll('.node');
+        graph.append("defs")
+            .selectAll("marker")
+            .data(["arrow"])
+            .enter()
+            .append("marker")
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("markerWidth", R)
+            .attr("markerHeight", R)
+            .attr("orient", "auto")
+            .attr('class', 'arrow')
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5");
 
-        simulation.nodes(nodes);
-        simulation.force('link').links(links);
+        const inLinks = inTransactions.map((transaction) => ({ source: transaction.address, target: address }));
+        const outLinks = outTransactions.map((transaction) => ({ source: address, target: transaction.address }));
+        const links = [...inLinks, ...outLinks];
+        const selectedLinks = graph
+            .selectAll('.link')
+            .data(links)
+            .enter().append('path')
+            .attr('class', 'link')
+            .attr('marker-mid', 'url(#arrow)');
 
-        selectedLinks = selectedLinks.data(links)
-            .enter().append('line')
-            .attr('class', 'link');
-
-        selectedNodes = selectedNodes.data(nodes)
-            .enter().append('g')
+        const fromNodes = inTransactions.map((node) => ({ ...node, x: width / 4, y: height / 2, transactions: 1 }));
+        const centerNode = { address, x: width / 2, y: height / 2, transactions: links.length };
+        const toNodes = outTransactions.map((node) => ({ ...node, x: width / 4 * 3, y: height / 2, transactions: 1 }));
+        const nodes = [ ...fromNodes, centerNode, ...toNodes].reduce(this.reduceDuplications, []);
+        const selectedNodes = graph
+            .selectAll('.node')
+            .data(nodes)
+            .enter()
+            .append('g')
             .attr('class', 'node');
 
         selectedNodes.append('circle')
-            .attr('r', r);
+            .attr('r', (d) => Math.log(d.transactions + 1) * R);
 
         selectedNodes.append('text')
-            .attr("dx", (d) => r + textOffset)
-            .attr("dy", (d) => textOffset)
-            .text((d) => d.address);
+            .attr('dx', () => -30)
+            .attr('dy', (d) => 20 + Math.log(d.transactions + 1) * R)
+            .text((d) => d.address.substring(0, 6).concat('...'));
+
+        simulation.nodes(nodes);
+        simulation.force('link')
+            .links(links);
+        simulation.on('tick', this.getTicked(selectedLinks, selectedNodes));
     }
 
-    componentDidMount() {
+    shouldComponentUpdate({ address, inTransactions, outTransactions }) {
+        return !_.isUndefined(inTransactions) &&
+            !_.isUndefined(outTransactions) &&
+            address === this.props.address;
+    }
+
+    componentWillUpdate() {
+        const graph = select('.graph');
+        graph.selectAll('*').remove();
+    }
+
+    componentDidUpdate() {
         this.renderGraph();
     }
 
     render() {
-        return <div className="graph" />;
+        return <svg className="graph" />;
     }
 }
 

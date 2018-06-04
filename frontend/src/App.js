@@ -25,19 +25,24 @@ class App extends Component {
         const { type, address } = this.state;
 
         fetch(`${API_URL}/${type}/transactions/${address}`)
-            .then(response => console.log(response))
+            .then(response => response.json())
+            .then(response => this.setState(response));
     }
 
     render() {
+        const { type, ...graphParams } = this.state;
+
         return (
-            <div>
+            <div className="app">
                 <h1>Blockchain Explorer</h1>
-                <select onChange={this.setType} value={this.state.type}>
-                    {BLOCKCHAIN_TYPES_VALUES.map(this.renderOption)}
-                </select>
-                <input onChange={this.setAddress} />
-                <button onClick={this.fetchData}>Explore</button>
-                <Graph />
+                <div className="topbar">
+                    <select onChange={this.setType} value={type}>
+                        {BLOCKCHAIN_TYPES_VALUES.map(this.renderOption)}
+                    </select>
+                    <input onChange={this.setAddress} />
+                    <button onClick={this.fetchData}>Explore</button>
+                </div>
+                <Graph {...graphParams} />
             </div>
         );
     }

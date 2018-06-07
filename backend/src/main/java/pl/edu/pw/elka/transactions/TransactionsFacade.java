@@ -28,6 +28,10 @@ public class TransactionsFacade {
         final List<EtherscanTransactionDto> transactions = etherscanFacade.getTransactionsForAddress(address, startBlock, endBlock)
                 .getTransactions();
 
+        if (transactions.size() > 50) {
+            throw new TooManyElementsException();
+        }
+
         final Stream<EtherscanTransactionDto> inStream = transactions.stream()
                 .filter(tx -> tx.getTo().equals(address));
 

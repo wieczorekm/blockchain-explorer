@@ -9,7 +9,7 @@ import fan from './assets/fan.svg';
 
 const API_URL = "https://blockchain-explorer-was-taken.herokuapp.com";
 const BLOCKCHAIN_TYPE = 'ethereum';
-const BLOCK_NUMBER = { MIN: 0, MAX: 9999999 };
+const BLOCK_NUMBER = { MIN: 0, MAX: 99999999 };
 
 class App extends Component {
     constructor(props) {
@@ -100,7 +100,7 @@ class App extends Component {
                     spinner && <img src={fan} className="spinner" />
                 }
                 {
-                    minedBlocksReward &&
+                    minedBlocksReward > 0 &&
                     <h2 className="reward">
                         <span className="bold">{minedBlocksReward}</span>
                         mined by provided address.

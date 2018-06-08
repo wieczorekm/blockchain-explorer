@@ -30,20 +30,13 @@ module.exports = {
                 use: ['style-loader', 'css-loader']
             },
             {
-                test: /\.svg$/,
-                loader: 'svg-inline-loader'
-            },
-            {
-                test: /\.ttf$/,
+                test: /\.(pdf|jpg|png|gif|svg|ico|ttf)$/,
                 use: [
                     {
-                        loader: 'ttf-loader',
-                        options: {
-                            name: './font/[hash].[ext]',
-                        },
+                        loader: 'url-loader'
                     },
                 ]
-            }
+            },
         ]
     }
 };

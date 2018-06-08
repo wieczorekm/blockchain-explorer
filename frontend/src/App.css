@@ -47,13 +47,13 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: MontserratRegular;
+    font-family: MontserratRegular, sans-serif;
     color: #292D32;
 }
 
 .logo {
     color: #3190DD;
-    font-family: MontserratItalic;
+    font-family: MontserratItalic, sans-serif;
     display: flex;
 }
 

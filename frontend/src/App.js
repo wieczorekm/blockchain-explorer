@@ -4,15 +4,17 @@ import _ from 'lodash';
 import Graph from './components/graph/Graph';
 
 import './App.css';
+import link from './assets/link.svg';
+import fan from './assets/fan.svg';
 
 const API_URL = "https://blockchain-explorer-was-taken.herokuapp.com";
-const BLOCKCHAIN_TYPES = { BITCOIN: 'bitcoin', ETHEREUM: 'ethereum' };
-const BLOCKCHAIN_TYPES_VALUES = Object.values(BLOCKCHAIN_TYPES);
+const BLOCKCHAIN_TYPE = 'ethereum';
+const BLOCK_NUMBER = { MIN: 0, MAX: 9999999 };
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { type: BLOCKCHAIN_TYPES_VALUES[0] };
+        this.state = { startBlock: BLOCK_NUMBER.MIN, endBlock: BLOCK_NUMBER.MAX };
     }
 
     setType = ({ target: { value } }) => this.setState({ type: value });
@@ -21,28 +23,93 @@ class App extends Component {
 
     setAddress = ({ target: { value } }) => this.setState({ address: value });
 
-    fetchData = () => {
-        const { type, address } = this.state;
+    setStartBlock = ({ target: { value } }) => this.setState({ startBlock: value });
 
-        fetch(`${API_URL}/${type}/transactions/${address}`)
-            .then(response => response.json())
-            .then(response => this.setState(response));
+    setEndBlock = ({ target: { value } }) => this.setState({ endBlock: value });
+
+    fetchData = () => {
+        const { address, startBlock, endBlock } = this.state;
+
+        if (!address) {
+            this.setState({ error: 'No address provided' });
+            return;
+        }
+
+        this.setState({ spinner: true });
+
+        fetch(`${API_URL}/${BLOCKCHAIN_TYPE}/transactions/${address.toLowerCase()}?startBlock=${startBlock}&endBlock=${endBlock}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw response;
+                }
+
+                return response.json();
+            })
+            .then(response => this.setState({ ...response, error: null, spinner: false }))
+            .catch((error) => error
+                .json()
+                .then(({ message }) => this.setState({ error: message, spinner: false }))
+            );
     }
 
     render() {
-        const { type, ...graphParams } = this.state;
-
+        const { error, spinner, minedBlocksReward, ...graphParams } = this.state;
         return (
             <div className="app">
-                <h1>Blockchain Explorer</h1>
-                <div className="topbar">
-                    <select onChange={this.setType} value={type}>
-                        {BLOCKCHAIN_TYPES_VALUES.map(this.renderOption)}
-                    </select>
-                    <input onChange={this.setAddress} />
+                <div className="logo">
+                    <img src={link} />
+                    <h1>
+                        Blockchain Explorer
+                    </h1>
+                </div>
+                <div className="toolbar">
+                    <h2>
+                        Explore
+                        <span className="bold">{BLOCKCHAIN_TYPE}</span>
+                        blockchain
+                    </h2>
+                    <div className="toolbar__entry">
+                        <label>Address: </label>
+                        <input onChange={this.setAddress} />
+                    </div>
+                    <div className="toolbar__entry">
+                        <label>Start block: </label>
+                        <input type="number"
+                               min={BLOCK_NUMBER.MIN}
+                               max={BLOCK_NUMBER.MAX}
+                               defaultValue={BLOCK_NUMBER.MIN}
+                               onChange={this.setStartBlock} />
+                    </div>
+                    <div className="toolbar__entry">
+                        <label>End block: </label>
+                        <input type="number"
+                               min={BLOCK_NUMBER.MIN}
+                               max={BLOCK_NUMBER.MAX}
+                               defaultValue={BLOCK_NUMBER.MAX}
+                               onChange={this.setEndBlock} />
+                    </div>
                     <button onClick={this.fetchData}>Explore</button>
                 </div>
-                <Graph {...graphParams} />
+                {
+                    error &&
+                    <div className="error">
+                        {error}
+                    </div>
+                }
+                {
+                    spinner && <img src={fan} className="spinner" />
+                }
+                {
+                    minedBlocksReward &&
+                    <h2 className="reward">
+                        <span className="bold">{minedBlocksReward}</span>
+                        mined by provided address.
+                    </h2>
+                }
+                {
+                    !error &&
+                    <Graph {...graphParams} />
+                }
             </div>
         );
     }

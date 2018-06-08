@@ -1,14 +1,22 @@
 .link {
-    stroke: #999;
     stroke-width: 2px;
     fill: none;
-}
-
-.arrow {
-    fill: #999;
 }
 
 .graph {
     width: 100%;
     flex-grow: 1;
+    justify-content: center;
+}
+
+.node {
+    fill: #292D32;
+}
+
+.incoming {
+    stroke: #4ECE67;
+}
+
+.outgoing {
+    stroke: #E25454;
 }

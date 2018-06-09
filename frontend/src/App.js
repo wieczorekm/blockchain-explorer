@@ -12,11 +12,6 @@ const BLOCKCHAIN_TYPE = 'ethereum';
 const BLOCK_NUMBER = { MIN: 0, MAX: 99999999 };
 
 class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { startBlock: BLOCK_NUMBER.MIN, endBlock: BLOCK_NUMBER.MAX };
-    }
-
     renderOption = (type) => <option value={type} key={type}>{_.capitalize(type)}</option>;
 
     fetchFormData = (event) => {
@@ -29,6 +24,8 @@ class App extends Component {
 
     fetchNodeData = (address) => {
         const { startBlock, endBlock } = this.state;
+
+        this.form.address.value = address;
 
         this.setState({ spinner: true });
         this.fetchData(address, startBlock, endBlock);
@@ -51,18 +48,25 @@ class App extends Component {
             );
     };
 
+    setFormRef = (ref) => this.form = ref;
+
+    constructor(props) {
+        super(props);
+        this.state = { startBlock: BLOCK_NUMBER.MIN, endBlock: BLOCK_NUMBER.MAX };
+    }
+
     render() {
         const { error, spinner, minedBlocksReward, address, ...graphParams } = this.state;
 
         return (
             <div className="app">
                 <div className="logo">
-                    <img src={link} />
+                    <img src={link} alt="logo" />
                     <h1>
                         Blockchain Explorer
                     </h1>
                 </div>
-                <form className="toolbar" onSubmit={this.fetchFormData}>
+                <form className="toolbar" onSubmit={this.fetchFormData} ref={this.setFormRef}>
                     <h2>
                         Explore
                         <span className="bold">{BLOCKCHAIN_TYPE}</span>
@@ -70,7 +74,7 @@ class App extends Component {
                     </h2>
                     <div className="toolbar__entry">
                         <label>Address: </label>
-                        <input name="address" required />
+                        <input name="address" required/>
                     </div>
                     <div className="toolbar__entry">
                         <label>Start block: </label>
@@ -78,7 +82,7 @@ class App extends Component {
                                min={BLOCK_NUMBER.MIN}
                                max={BLOCK_NUMBER.MAX}
                                defaultValue={BLOCK_NUMBER.MIN}
-                               name="startBlock" />
+                               name="startBlock"/>
                     </div>
                     <div className="toolbar__entry">
                         <label>End block: </label>
@@ -86,7 +90,7 @@ class App extends Component {
                                min={BLOCK_NUMBER.MIN}
                                max={BLOCK_NUMBER.MAX}
                                defaultValue={BLOCK_NUMBER.MAX}
-                               name="endBlock" />
+                               name="endBlock"/>
                     </div>
                     <button type="submit">Explore</button>
                 </form>
@@ -99,7 +103,7 @@ class App extends Component {
                 {
                     spinner &&
                     <div className="spinner__wrapper">
-                        <img src={fan} className="spinner" />
+                        <img src={fan} className="spinner" alt="spinner" />
                     </div>
                 }
                 {
@@ -111,7 +115,7 @@ class App extends Component {
                 }
                 {
                     (!error && !spinner && address) &&
-                    <Graph {...graphParams} address={address} onClick={this.fetchNodeData} />
+                    <Graph {...graphParams} address={address} onClick={this.fetchNodeData}/>
                 }
             </div>
         );

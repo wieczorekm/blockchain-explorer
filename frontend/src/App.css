@@ -43,6 +43,20 @@ button {
     margin: 10px 0;
 }
 
+h1, h2 {
+    margin: 0;
+    font-weight: normal;
+}
+
+h1 {
+    padding: 0 5px;
+}
+
+h2 {
+    align-self: center;
+    margin: 1em;
+}
+
 .app {
     display: flex;
     flex-direction: column;
@@ -55,21 +69,13 @@ button {
     color: #3190DD;
     font-family: MontserratItalic, sans-serif;
     display: flex;
-}
-
-.logo h1 {
-    font-weight: normal;
-    padding: 0 5px;
+    align-items: center;
+    margin: 1em;
 }
 
 .toolbar {
     display: flex;
     flex-direction: column;
-}
-
-.app h2 {
-    font-weight: normal;
-    align-self: center;
 }
 
 .bold {

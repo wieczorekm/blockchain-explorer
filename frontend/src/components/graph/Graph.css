@@ -1,3 +1,20 @@
+svg {
+    flex-grow: 1;
+    width: 100%;
+}
+
+p {
+    white-space: pre;
+}
+
+h3, h4 {
+    margin: 0;
+}
+
+h3 {
+    padding: 1em 1.5em;
+}
+
 .link {
     stroke-width: 2px;
     fill: none;
@@ -7,6 +24,8 @@
     width: 100%;
     flex-grow: 1;
     justify-content: center;
+    display: flex;
+    position: relative;
 }
 
 .node {
@@ -20,4 +39,33 @@
 
 .outgoing {
     stroke: #E25454;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 2px solid #3190DD;
+    height: 200px;
+    overflow: auto;
+    width: 530px;
+}
+
+.title {
+    border-bottom: 1px solid #FF8C40;
+}
+
+.transactions__wrapper {
+    display: flex;
+    padding: 1.5em 0;
+}
+
+.transactions--incoming,
+.transactions--outgoing {
+    padding: 0 1em;
+    width: 50%;
+}
+
+.transactions--incoming {
+    border-right: 1px solid #292D32;
 }

@@ -134,10 +134,10 @@ class Graph extends Component {
             const { value, source: sourceAddress, target: targetAddress } = link;
             const source = nodes.find((node) => node.address === sourceAddress);
             const sourceTransaction =
-                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: 'incoming', address: targetAddress };
+                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: 'outgoing', address: targetAddress };
             const target = nodes.find((node) => node.address === targetAddress);
             const targetTransaction =
-                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: 'outgoing', address: sourceAddress };
+                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: 'incoming', address: sourceAddress };
 
             source.transactions = source.transactions ?
                 source.transactions.concat(sourceTransaction) : [].concat(sourceTransaction);
@@ -146,6 +146,7 @@ class Graph extends Component {
         });
 
         nodes.map((node) => {
+            node.transactions = node.transactions ? node.transactions : [];
             node.size = this.getSize(node.transactions.length);
 
             return node;

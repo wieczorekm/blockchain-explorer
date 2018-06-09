@@ -97,6 +97,13 @@ class App extends Component {
                             {error}
                         </div>
                     }
+                    {
+                        minedBlocksReward > 0 && !spinner &&
+                        <h2 className="reward">
+                            <span className="bold">{minedBlocksReward.toFixed(4)} Ether</span>
+                            reward for mining
+                        </h2>
+                    }
                 </div>
                 {
                     spinner &&
@@ -105,14 +112,7 @@ class App extends Component {
                     </div>
                 }
                 {
-                    minedBlocksReward > 0 &&
-                    <h2 className="reward">
-                        <span className="bold">{minedBlocksReward}</span>
-                        mined by provided address.
-                    </h2>
-                }
-                {
-                    (!error && !spinner && address) &&
+                    !error && !spinner && address &&
                     <Graph {...graphParams} address={address} onClick={this.fetchNodeData}/>
                 }
             </div>

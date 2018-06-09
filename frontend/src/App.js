@@ -32,7 +32,7 @@ class App extends Component {
     };
 
     fetchData = (address, startBlock, endBlock) => {
-        fetch(`${API_URL}/${BLOCKCHAIN_TYPE}/transactions/${address}?${startBlock}&${endBlock}`)
+        fetch(`${API_URL}/${BLOCKCHAIN_TYPE}/transactions/${address.toLowerCase()}?startBlock=${startBlock}&endBlock=${endBlock}`)
             .then((response) => {
                 if (!response.ok) {
                     throw response;
@@ -41,11 +41,7 @@ class App extends Component {
                 return response.json();
             })
             .then(response => this.setState({ ...response, error: null, spinner: false }))
-            .catch((error) =>
-                error
-                    .json()
-                    .then(({ message }) => this.setState({ error: message, spinner: false }))
-            );
+            .catch((error) => error.json().then(({ message }) => this.setState({ error: message, spinner: false })));
     };
 
     setFormRef = (ref) => this.form = ref;
@@ -60,46 +56,48 @@ class App extends Component {
 
         return (
             <div className="app">
-                <div className="logo">
-                    <img src={link} alt="logo" />
-                    <h1>
-                        Blockchain Explorer
-                    </h1>
+                <div className="toolbar__wrapper">
+                    <div className="logo">
+                        <img src={link} alt="logo" />
+                        <h1>
+                            Blockchain Explorer
+                        </h1>
+                    </div>
+                    <form className="toolbar" onSubmit={this.fetchFormData} ref={this.setFormRef}>
+                        <h2>
+                            Explore
+                            <span className="bold">{BLOCKCHAIN_TYPE}</span>
+                            blockchain
+                        </h2>
+                        <div className="toolbar__entry">
+                            <label>Address: </label>
+                            <input name="address" required/>
+                        </div>
+                        <div className="toolbar__entry">
+                            <label>Start block: </label>
+                            <input type="number"
+                                   min={BLOCK_NUMBER.MIN}
+                                   max={BLOCK_NUMBER.MAX}
+                                   defaultValue={BLOCK_NUMBER.MIN}
+                                   name="startBlock"/>
+                        </div>
+                        <div className="toolbar__entry">
+                            <label>End block: </label>
+                            <input type="number"
+                                   min={BLOCK_NUMBER.MIN}
+                                   max={BLOCK_NUMBER.MAX}
+                                   defaultValue={BLOCK_NUMBER.MAX}
+                                   name="endBlock"/>
+                        </div>
+                        <button type="submit">Explore</button>
+                    </form>
+                    {
+                        error && !spinner &&
+                        <div className="error">
+                            {error}
+                        </div>
+                    }
                 </div>
-                <form className="toolbar" onSubmit={this.fetchFormData} ref={this.setFormRef}>
-                    <h2>
-                        Explore
-                        <span className="bold">{BLOCKCHAIN_TYPE}</span>
-                        blockchain
-                    </h2>
-                    <div className="toolbar__entry">
-                        <label>Address: </label>
-                        <input name="address" required/>
-                    </div>
-                    <div className="toolbar__entry">
-                        <label>Start block: </label>
-                        <input type="number"
-                               min={BLOCK_NUMBER.MIN}
-                               max={BLOCK_NUMBER.MAX}
-                               defaultValue={BLOCK_NUMBER.MIN}
-                               name="startBlock"/>
-                    </div>
-                    <div className="toolbar__entry">
-                        <label>End block: </label>
-                        <input type="number"
-                               min={BLOCK_NUMBER.MIN}
-                               max={BLOCK_NUMBER.MAX}
-                               defaultValue={BLOCK_NUMBER.MAX}
-                               name="endBlock"/>
-                    </div>
-                    <button type="submit">Explore</button>
-                </form>
-                {
-                    error &&
-                    <div className="error">
-                        {error}
-                    </div>
-                }
                 {
                     spinner &&
                     <div className="spinner__wrapper">

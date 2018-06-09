@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import { select } from 'd3-selection';
-import { forceSimulation, forceManyBody, forceLink } from 'd3-force';
+import { forceSimulation, forceManyBody, forceLink, forceCenter } from 'd3-force';
 
 import './Graph.css';
 
@@ -10,7 +10,6 @@ const ARROW_SIZE = 5;
 const CHARGE_STRENGTH = -30;
 const SHORT_ADDRESS_LENGTH = 6;
 const VALUE_DECIMAL_PLACES = 4;
-const EDGE_OFFSET = 50;
 const LABEL = { WIDTH: 60, OFFSET: 20};
 const TOOLTIP = { WIDTH: 530, HEIGHT: 200};
 const GRAPH_TYPES = { INCOMING: 'incoming', OUTGOING: 'outgoing'};
@@ -51,7 +50,7 @@ class Graph extends Component {
             .attr('class', 'tooltip')
             .style('left', `${horizontalPosition}px`)
             .style('top', `${verticalPosition}px`);
-        
+
         tooltip.append('h3')
             .attr('class', 'title')
             .text(address);
@@ -88,11 +87,13 @@ class Graph extends Component {
         const { address, inTransactions, outTransactions, onClick } = this.props;
         const svg = select('.graph').append('svg').on('click', () => this.hideTooltip());
         const { width, height } = svg.node().getBoundingClientRect();
-        const offsetWidth = width > 2 * height ? (width - 2 * height) / 2 : 0;
-        const adjustedWidth = width > 2 * height ? 2 * height : width;
+        const side = Math.min(width, height);
+        const offsetWidth = (width - side) / 2;
+        const offsetHeight = (height - side) / 2;
         const simulation = forceSimulation()
             .force('charge', forceManyBody().strength(CHARGE_STRENGTH))
-            .force('link', forceLink().id((d) => d.address).distance(height / 2 - EDGE_OFFSET));
+            .force('link', forceLink().id((d) => d.address).distance(side / 3))
+            .force('center', forceCenter(side / 2 + offsetWidth, side / 2 + offsetHeight));
 
         svg.append("defs")
             .selectAll("marker")
@@ -123,10 +124,10 @@ class Graph extends Component {
             .attr('marker-mid', 'url(#arrow)');
 
         const fromNodes = inTransactions.map((node) =>
-            ({ ...node, x: adjustedWidth / 4 + offsetWidth, y: height / 2 }));
-        const centerNode = { address, x: adjustedWidth / 2 + offsetWidth, y: height / 2 };
+            ({ ...node, x: offsetWidth, y: side / 2 + offsetHeight }));
+        const centerNode = { address, x: side / 2 + offsetWidth, y: side / 2 + offsetHeight };
         const toNodes = outTransactions.map((node) =>
-            ({ ...node, x: adjustedWidth / 4 * 3 + offsetWidth, y: height / 2 }));
+            ({ ...node, x: side - offsetWidth, y: side / 2 + offsetHeight }));
         const nodes = [ ...fromNodes, centerNode, ...toNodes].reduce(this.reduceDuplications, []);
 
         links.forEach((link) => {
@@ -167,7 +168,7 @@ class Graph extends Component {
 
         simulation.nodes(nodes);
         simulation.force('link').links(links);
-        simulation.on('tick', this.getTicked(selectedLinks, selectedNodes));
+        simulation.on('tick', this.getTicked(selectedLinks, selectedNodes, width, height));
     };
 
     componentDidMount() {

@@ -96,3 +96,11 @@ button {
 .spinner {
     animation: spin 2s linear infinite;
 }
+
+.spinner__wrapper {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}

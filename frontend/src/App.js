@@ -17,27 +17,25 @@ class App extends Component {
         this.state = { startBlock: BLOCK_NUMBER.MIN, endBlock: BLOCK_NUMBER.MAX };
     }
 
-    setType = ({ target: { value } }) => this.setState({ type: value });
-
     renderOption = (type) => <option value={type} key={type}>{_.capitalize(type)}</option>;
 
-    setAddress = ({ target: { value } }) => this.setState({ address: value });
+    fetchFormData = (event) => {
+        const { target: { address, startBlock, endBlock } } = event;
 
-    setStartBlock = ({ target: { value } }) => this.setState({ startBlock: value });
+        event.preventDefault();
+        this.setState({ spinner: true });
+        this.fetchData(address.value, startBlock.value, endBlock.value);
+    };
 
-    setEndBlock = ({ target: { value } }) => this.setState({ endBlock: value });
-
-    fetchData = () => {
-        const { address, startBlock, endBlock } = this.state;
-
-        if (!address) {
-            this.setState({ error: 'No address provided' });
-            return;
-        }
+    fetchNodeData = (address) => {
+        const { startBlock, endBlock } = this.state;
 
         this.setState({ spinner: true });
+        this.fetchData(address, startBlock, endBlock);
+    };
 
-        fetch(`${API_URL}/${BLOCKCHAIN_TYPE}/transactions/${address.toLowerCase()}?startBlock=${startBlock}&endBlock=${endBlock}`)
+    fetchData = (address, startBlock, endBlock) => {
+        fetch(`${API_URL}/${BLOCKCHAIN_TYPE}/transactions/${address}?${startBlock}&${endBlock}`)
             .then((response) => {
                 if (!response.ok) {
                     throw response;
@@ -46,14 +44,16 @@ class App extends Component {
                 return response.json();
             })
             .then(response => this.setState({ ...response, error: null, spinner: false }))
-            .catch((error) => error
-                .json()
-                .then(({ message }) => this.setState({ error: message, spinner: false }))
+            .catch((error) =>
+                error
+                    .json()
+                    .then(({ message }) => this.setState({ error: message, spinner: false }))
             );
-    }
+    };
 
     render() {
-        const { error, spinner, minedBlocksReward, ...graphParams } = this.state;
+        const { error, spinner, minedBlocksReward, address, ...graphParams } = this.state;
+
         return (
             <div className="app">
                 <div className="logo">
@@ -62,7 +62,7 @@ class App extends Component {
                         Blockchain Explorer
                     </h1>
                 </div>
-                <div className="toolbar">
+                <form className="toolbar" onSubmit={this.fetchFormData}>
                     <h2>
                         Explore
                         <span className="bold">{BLOCKCHAIN_TYPE}</span>
@@ -70,7 +70,7 @@ class App extends Component {
                     </h2>
                     <div className="toolbar__entry">
                         <label>Address: </label>
-                        <input onChange={this.setAddress} />
+                        <input name="address" required />
                     </div>
                     <div className="toolbar__entry">
                         <label>Start block: </label>
@@ -78,7 +78,7 @@ class App extends Component {
                                min={BLOCK_NUMBER.MIN}
                                max={BLOCK_NUMBER.MAX}
                                defaultValue={BLOCK_NUMBER.MIN}
-                               onChange={this.setStartBlock} />
+                               name="startBlock" />
                     </div>
                     <div className="toolbar__entry">
                         <label>End block: </label>
@@ -86,10 +86,10 @@ class App extends Component {
                                min={BLOCK_NUMBER.MIN}
                                max={BLOCK_NUMBER.MAX}
                                defaultValue={BLOCK_NUMBER.MAX}
-                               onChange={this.setEndBlock} />
+                               name="endBlock" />
                     </div>
-                    <button onClick={this.fetchData}>Explore</button>
-                </div>
+                    <button type="submit">Explore</button>
+                </form>
                 {
                     error &&
                     <div className="error">
@@ -97,7 +97,10 @@ class App extends Component {
                     </div>
                 }
                 {
-                    spinner && <img src={fan} className="spinner" />
+                    spinner &&
+                    <div className="spinner__wrapper">
+                        <img src={fan} className="spinner" />
+                    </div>
                 }
                 {
                     minedBlocksReward > 0 &&
@@ -107,8 +110,8 @@ class App extends Component {
                     </h2>
                 }
                 {
-                    !error &&
-                    <Graph {...graphParams} />
+                    (!error && !spinner && address) &&
+                    <Graph {...graphParams} address={address} onClick={this.fetchNodeData} />
                 }
             </div>
         );

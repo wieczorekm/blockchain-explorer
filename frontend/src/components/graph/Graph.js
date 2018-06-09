@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import { select } from 'd3-selection';
 import { forceSimulation, forceManyBody, forceLink } from 'd3-force';
 
@@ -20,7 +19,7 @@ class Graph extends Component {
         return prev.concat(curr);
     };
 
-    getTicked = (links, nodes, width, height) => () => {
+    getTicked = (links, nodes) => () => {
         links.attr('d', ({ target, source }) => {
             const dx = target.x - source.x;
             const dy = target.y - source.y;
@@ -32,8 +31,10 @@ class Graph extends Component {
         nodes.attr('transform', (d) => `translate(${d.x},${d.y})`);
     };
 
+    getSize = (number) => Math.log(number + 1) * R;
+
     renderGraph = () => {
-        const { address, inTransactions, outTransactions } = this.props;
+        const { address, inTransactions, outTransactions, onClick } = this.props;
         const graph = select('.graph');
         const { width, height } = graph
             .node()
@@ -58,8 +59,10 @@ class Graph extends Component {
             .append("path")
             .attr("d", "M0,-5L10,0L0,5");
 
-        const inLinks = inTransactions.map((transaction) => ({ source: transaction.address, target: address, class: 'incoming' }));
-        const outLinks = outTransactions.map((transaction) => ({ source: address, target: transaction.address, class: 'outgoing' }));
+        const inLinks = inTransactions.map((transaction) =>
+            ({ source: transaction.address, target: address, class: 'incoming' }));
+        const outLinks = outTransactions.map((transaction) =>
+            ({ source: address, target: transaction.address, class: 'outgoing' }));
         const links = [...inLinks, ...outLinks];
 
         const selectedLinks = graph
@@ -69,35 +72,36 @@ class Graph extends Component {
             .attr('class', (d) => `link ${d.class}`)
             .attr('marker-mid', 'url(#arrow)');
 
-        const fromNodes = inTransactions.map((node) => ({ ...node, x: adjustedWidth / 4 + offsetWidth, y: height / 2, transactions: 1 }));
+        const fromNodes = inTransactions.map((node) =>
+            ({ ...node, x: adjustedWidth / 4 + offsetWidth, y: height / 2, transactions: 1 }));
         const centerNode = { address, x: adjustedWidth / 2 + offsetWidth, y: height / 2, transactions: links.length };
-        const toNodes = outTransactions.map((node) => ({ ...node, x: adjustedWidth / 4 * 3 + offsetWidth, y: height / 2, transactions: 1 }));
+        const toNodes = outTransactions.map((node) =>
+            ({ ...node, x: adjustedWidth / 4 * 3 + offsetWidth, y: height / 2, transactions: 1 }));
         const nodes = [ ...fromNodes, centerNode, ...toNodes].reduce(this.reduceDuplications, []);
         const selectedNodes = graph
             .selectAll('.node')
             .data(nodes)
             .enter()
             .append('g')
+            .on('click', (d) => onClick(d.address))
             .attr('class', 'node');
 
         selectedNodes.append('circle')
-            .attr('r', (d) => Math.log(d.transactions + 1) * R);
+            .attr('r', (d) => this.getSize(d.transactions));
 
         selectedNodes.append('text')
             .attr('dx', () => -30)
-            .attr('dy', (d) => 20 + Math.log(d.transactions + 1) * R)
+            .attr('dy', (d) => 20 + this.getSize(d.transactions))
             .text((d) => d.address.substring(0, 6).concat('...'));
 
         simulation.nodes(nodes);
         simulation.force('link')
             .links(links);
-        simulation.on('tick', this.getTicked(selectedLinks, selectedNodes, width, height));
-    }
+        simulation.on('tick', this.getTicked(selectedLinks, selectedNodes));
+    };
 
-    shouldComponentUpdate({ address, inTransactions, outTransactions }) {
-        return !_.isUndefined(inTransactions) &&
-            !_.isUndefined(outTransactions) &&
-            address === this.props.address;
+    componentDidMount() {
+        this.renderGraph();
     }
 
     componentWillUpdate() {

@@ -3,10 +3,6 @@ svg {
     width: 100%;
 }
 
-p {
-    white-space: pre;
-}
-
 h3, h4 {
     margin: 0;
 }
@@ -40,7 +36,19 @@ h3 {
 
 .node--current circle {
     fill: #fff;
-    stroke: #000;
+    stroke: #292D32;
+    cursor: default;
+}
+
+.node--mined {
+    font-weight: bold;
+}
+
+.node--mined circle {
+    cursor: default;
+    fill: #FF8C40;
+    stroke: #292D32;
+    stroke-width: 5px;
 }
 
 .incoming {

@@ -12,6 +12,7 @@ const SHORT_ADDRESS_LENGTH = 6;
 const VALUE_DECIMAL_PLACES = 4;
 const LABEL = { WIDTH: 60, OFFSET: 20};
 const GRAPH_TYPES = { INCOMING: 'incoming', OUTGOING: 'outgoing'};
+const MINED_ADDRESS = 'MINED';
 
 class Graph extends Component {
     reduceDuplications = (prev, curr) => {
@@ -36,7 +37,8 @@ class Graph extends Component {
 
     getDirection = (type) => type === GRAPH_TYPES.INCOMING ? 'from' : 'to';
 
-    getShortAddress = (address) => address.substring(0, SHORT_ADDRESS_LENGTH).concat('...');
+    getShortAddress = (address) =>
+        address === MINED_ADDRESS ? MINED_ADDRESS : address.substring(0, SHORT_ADDRESS_LENGTH).concat('...');
 
     showTooltip = ({ x, y, size, address, transactions }, width, height) => {
         this.hideTooltip();
@@ -71,7 +73,7 @@ class Graph extends Component {
 
             container
                 .append('p')
-                .text(`${value} Ether   ${this.getDirection(type)}   ${this.getShortAddress(address)}`);
+                .text(`${value} Ether ${this.getDirection(type)} ${this.getShortAddress(address)}`);
         });
 
         const { width: tooltipWidth, height: tooltipHeight } = tooltip.node().getBoundingClientRect();
@@ -84,7 +86,7 @@ class Graph extends Component {
     hideTooltip = () => select('.graph').select('.tooltip').remove();
 
     renderGraph = () => {
-        const { address, inTransactions, outTransactions, onClick } = this.props;
+        const { address, inTransactions, outTransactions, onClick, mined } = this.props;
         const svg = select('.graph').append('svg').on('click', () => this.hideTooltip());
         const { width, height } = svg.node().getBoundingClientRect();
         const side = Math.min(width, height);
@@ -110,34 +112,34 @@ class Graph extends Component {
             .attr("d", "M0,-5L10,0L0,5");
 
         const inLinks = inTransactions.map((transaction) =>
-            ({ source: transaction.address, target: address, type: 'outgoing', value: transaction.value }));
+            ({ source: transaction.address, target: address, type: GRAPH_TYPES.INCOMING, value: transaction.value }));
         const outLinks = outTransactions.map((transaction) =>
-            ({ source: address, target: transaction.address, type: 'incoming', value: transaction.value }));
-        const links = [...inLinks, ...outLinks];
-
-        const selectedLinks = svg
-            .selectAll('.link')
-            .data(links)
-            .enter()
-            .append('path')
-            .attr('class', (d) => `link ${d.type}`)
-            .attr('marker-mid', 'url(#arrow)');
+            ({ source: address, target: transaction.address, type: GRAPH_TYPES.OUTGOING, value: transaction.value }));
+        let links = [...inLinks, ...outLinks];
 
         const fromNodes = inTransactions.map((node) =>
             ({ ...node, x: offsetWidth, y: side / 2 + offsetHeight }));
         const centerNode = { address, x: side / 2 + offsetWidth, y: side / 2 + offsetHeight, current: true };
         const toNodes = outTransactions.map((node) =>
             ({ ...node, x: side - offsetWidth, y: side / 2 + offsetHeight }));
-        const nodes = [ ...fromNodes, centerNode, ...toNodes].reduce(this.reduceDuplications, []);
+        let nodes = [...fromNodes, centerNode, ...toNodes].reduce(this.reduceDuplications, []);
+
+        if (mined) {
+            const minedLink = { source: MINED_ADDRESS, target: address, type: GRAPH_TYPES.INCOMING, value: mined };
+            const minedNode = { address: MINED_ADDRESS, x: side / 2, y: side + offsetHeight, mined: true };
+
+            links = links.concat(minedLink);
+            nodes = nodes.concat(minedNode);
+        }
 
         links.forEach((link) => {
             const { value, source: sourceAddress, target: targetAddress } = link;
             const source = nodes.find((node) => node.address === sourceAddress);
             const sourceTransaction =
-                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: 'outgoing', address: targetAddress };
+                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: GRAPH_TYPES.OUTGOING, address: targetAddress };
             const target = nodes.find((node) => node.address === targetAddress);
             const targetTransaction =
-                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: 'incoming', address: sourceAddress };
+                { value: value.toFixed(VALUE_DECIMAL_PLACES), type: GRAPH_TYPES.INCOMING, address: sourceAddress };
 
             source.transactions = source.transactions ?
                 source.transactions.concat(sourceTransaction) : [].concat(sourceTransaction);
@@ -152,6 +154,14 @@ class Graph extends Component {
             return node;
         });
 
+        const selectedLinks = svg
+            .selectAll('.link')
+            .data(links)
+            .enter()
+            .append('path')
+            .attr('class', (d) => `link ${d.type}`)
+            .attr('marker-mid', 'url(#arrow)');
+
         const selectedNodes = svg
             .selectAll('.node')
             .data(nodes)
@@ -159,9 +169,17 @@ class Graph extends Component {
             .append('g')
             .on('click', (d) => onClick(d.address))
             .on('mouseover', (d) => this.showTooltip(d, width, height))
-            .attr('class', (d) => d.current ? 'node node--current' : 'node');
+            .attr('class', (d) => {
+                if (d.current) {
+                    return 'node node--current';
+                } else if (d.mined) {
+                    return 'node node--mined';
+                }
 
-        selectedNodes.append('circle').attr('r', (d) => d.size).style('stroke-width', (d) => d.current ? d.size / 3 : 0);
+                return 'node';
+            });
+
+        selectedNodes.append('circle').attr('r', (d) => d.size).style('stroke-width', (d) => d.current ? d.size / 3 : '');
         selectedNodes.append('text')
             .attr('dx', () => -LABEL.WIDTH / 2)
             .attr('dy', (d) => LABEL.OFFSET + d.size)

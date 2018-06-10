@@ -25,7 +25,7 @@ class App extends Component {
     fetchNodeData = (address) => {
         const { address: oldAddress, startBlock, endBlock } = this.state;
 
-        if (address === oldAddress) {
+        if (address === oldAddress || address === 'MINED') {
             return;
         }
 
@@ -101,13 +101,6 @@ class App extends Component {
                             {error}
                         </div>
                     }
-                    {
-                        minedBlocksReward > 0 && !spinner &&
-                        <h2 className="reward">
-                            <span className="bold">{minedBlocksReward.toFixed(4)} Ether</span>
-                            reward for mining
-                        </h2>
-                    }
                 </div>
                 {
                     spinner &&
@@ -117,7 +110,7 @@ class App extends Component {
                 }
                 {
                     !error && !spinner && address &&
-                    <Graph {...graphParams} address={address} onClick={this.fetchNodeData}/>
+                    <Graph {...graphParams} address={address} mined={minedBlocksReward} onClick={this.fetchNodeData}/>
                 }
             </div>
         );

@@ -13,6 +13,7 @@ h3, h4 {
 
 h3 {
     padding: 1em 1.5em;
+    text-align: center;
 }
 
 .link {
@@ -33,6 +34,15 @@ h3 {
     cursor: pointer;
 }
 
+.node--current {
+    font-weight: bold;
+}
+
+.node--current circle {
+    fill: #fff;
+    stroke: #000;
+}
+
 .incoming {
     stroke: #4ECE67;
 }
@@ -46,9 +56,9 @@ h3 {
     background-color: #fff;
     border-radius: 5px;
     border: 2px solid #3190DD;
-    height: 200px;
+    max-height: 300px;
     overflow: auto;
-    width: 530px;
+    max-width: 560px;
 }
 
 .title {

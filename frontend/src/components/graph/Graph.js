@@ -11,7 +11,6 @@ const CHARGE_STRENGTH = -30;
 const SHORT_ADDRESS_LENGTH = 6;
 const VALUE_DECIMAL_PLACES = 4;
 const LABEL = { WIDTH: 60, OFFSET: 20};
-const TOOLTIP = { WIDTH: 530, HEIGHT: 200};
 const GRAPH_TYPES = { INCOMING: 'incoming', OUTGOING: 'outgoing'};
 
 class Graph extends Component {
@@ -33,23 +32,18 @@ class Graph extends Component {
         nodes.attr('transform', (d) => `translate(${d.x},${d.y})`);
     });
 
-    getSize = (val) => Math.log(val + 1) * BASE_RADIUS;
+    getSize = (val) => Math.log(val + 2) * BASE_RADIUS;
 
     getDirection = (type) => type === GRAPH_TYPES.INCOMING ? 'from' : 'to';
 
     getShortAddress = (address) => address.substring(0, SHORT_ADDRESS_LENGTH).concat('...');
 
     showTooltip = ({ x, y, size, address, transactions }, width, height) => {
-        const horizontalPosition = x + size + TOOLTIP.WIDTH < width ? x + size : x - TOOLTIP.WIDTH - 2 * size;
-        const verticalPosition = y + size + TOOLTIP.HEIGHT < height ? y + size : y - TOOLTIP.HEIGHT - 2 * size;
-
         this.hideTooltip();
 
         const tooltip = select('.graph')
             .insert('div')
-            .attr('class', 'tooltip')
-            .style('left', `${horizontalPosition}px`)
-            .style('top', `${verticalPosition}px`);
+            .attr('class', 'tooltip');
 
         tooltip.append('h3')
             .attr('class', 'title')
@@ -79,6 +73,12 @@ class Graph extends Component {
                 .append('p')
                 .text(`${value} Ether   ${this.getDirection(type)}   ${this.getShortAddress(address)}`);
         });
+
+        const { width: tooltipWidth, height: tooltipHeight } = tooltip.node().getBoundingClientRect();
+        const horizontalPosition = x + size + tooltipWidth < width ? x + size : x - tooltipWidth - size;
+        const verticalPosition = y + size + tooltipHeight < height ? y + size : y - tooltipHeight - size;
+
+        tooltip.style('left', `${horizontalPosition}px`).style('top', `${verticalPosition}px`);
     };
 
     hideTooltip = () => select('.graph').select('.tooltip').remove();
@@ -125,7 +125,7 @@ class Graph extends Component {
 
         const fromNodes = inTransactions.map((node) =>
             ({ ...node, x: offsetWidth, y: side / 2 + offsetHeight }));
-        const centerNode = { address, x: side / 2 + offsetWidth, y: side / 2 + offsetHeight };
+        const centerNode = { address, x: side / 2 + offsetWidth, y: side / 2 + offsetHeight, current: true };
         const toNodes = outTransactions.map((node) =>
             ({ ...node, x: side - offsetWidth, y: side / 2 + offsetHeight }));
         const nodes = [ ...fromNodes, centerNode, ...toNodes].reduce(this.reduceDuplications, []);
@@ -159,9 +159,9 @@ class Graph extends Component {
             .append('g')
             .on('click', (d) => onClick(d.address))
             .on('mouseover', (d) => this.showTooltip(d, width, height))
-            .attr('class', 'node');
+            .attr('class', (d) => d.current ? 'node node--current' : 'node');
 
-        selectedNodes.append('circle').attr('r', (d) => d.size);
+        selectedNodes.append('circle').attr('r', (d) => d.size).style('stroke-width', (d) => d.current ? d.size / 3 : 0);
         selectedNodes.append('text')
             .attr('dx', () => -LABEL.WIDTH / 2)
             .attr('dy', (d) => LABEL.OFFSET + d.size)

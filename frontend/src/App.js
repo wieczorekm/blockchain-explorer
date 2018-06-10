@@ -23,7 +23,11 @@ class App extends Component {
     };
 
     fetchNodeData = (address) => {
-        const { startBlock, endBlock } = this.state;
+        const { address: oldAddress, startBlock, endBlock } = this.state;
+
+        if (address === oldAddress) {
+            return;
+        }
 
         this.form.address.value = address;
 
@@ -40,7 +44,7 @@ class App extends Component {
 
                 return response.json();
             })
-            .then(response => this.setState({ ...response, error: null, spinner: false }))
+            .then(response => this.setState({ ...response, error: null, spinner: false, startBlock, endBlock }))
             .catch((error) => error.json().then(({ message }) => this.setState({ error: message, spinner: false })));
     };
 

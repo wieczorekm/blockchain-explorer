@@ -70,6 +70,7 @@ h2 {
     font-family: MontserratItalic, sans-serif;
     display: flex;
     align-items: center;
+    justify-content: center;
     margin: 1em;
 }
 
